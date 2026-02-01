@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, getDocs, doc, updateDoc, increment, Timestamp } from "firebase/firestore";
 import { Trophy } from "lucide-react";
+import PlayerAvatar from "@/components/PlayerAvatar";
 
 interface Player {
     id: string;
@@ -182,11 +183,9 @@ export default function AddMatchForm() {
                                                     : "border-stone-700 bg-stone-800/50 hover:border-stone-600"
                                                 }`}
                                         >
-                                            <img
-                                                src={player.avatar_url}
-                                                alt={player.name}
-                                                className="w-12 h-12 rounded-full mx-auto mb-2"
-                                            />
+                                            <div className="mx-auto mb-2 flex justify-center">
+                                                <PlayerAvatar name={player.name} size="lg" />
+                                            </div>
                                             <p className="font-semibold text-center">{player.name}</p>
                                             {isSelected && (
                                                 <p className="text-xs text-yellow-500 text-center mt-1">
@@ -234,11 +233,7 @@ export default function AddMatchForm() {
                                                 {index + 1}º
                                             </span>
 
-                                            <img
-                                                src={player.avatar_url}
-                                                alt={player.name}
-                                                className="w-10 h-10 rounded-full"
-                                            />
+                                            <PlayerAvatar name={player.name} size="md" />
 
                                             <span className="font-semibold flex-1">{player.name}</span>
 

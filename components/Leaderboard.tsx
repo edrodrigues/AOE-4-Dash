@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Crown } from "lucide-react";
 import PointsEvolutionChart from "@/components/PointsEvolutionChart";
-import { getPlayerColor } from "@/lib/playerColors";
+import PlayerAvatar from "@/components/PlayerAvatar";
 
 interface PlayerStats {
     id: string;
@@ -62,7 +62,7 @@ export default function Leaderboard() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-6xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 mb-4">
-                        Tabela de Classificação
+                        Classificação
                     </h2>
                     <p className="text-stone-400 text-lg">
                         Quem dominará o império?
@@ -127,15 +127,7 @@ export default function Leaderboard() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div
-                                                        className="w-3 h-3 rounded-full flex-shrink-0"
-                                                        style={{ backgroundColor: getPlayerColor(player.name) }}
-                                                    />
-                                                    <img
-                                                        src={player.avatar_url}
-                                                        alt={player.name}
-                                                        className="w-10 h-10 rounded-full ring-2 ring-yellow-700/50"
-                                                    />
+                                                    <PlayerAvatar name={player.name} size="md" ring />
                                                     <span className="font-semibold text-lg">{player.name}</span>
                                                 </div>
                                             </td>

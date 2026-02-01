@@ -1,6 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import { Trophy } from "lucide-react";
 
 export default function Hero() {
+    const [matchesCount, setMatchesCount] = useState(0);
+    const [playersCount, setPlayersCount] = useState(0);
+
+    useEffect(() => {
+        const matchesRef = collection(db, "matches");
+        const playersRef = collection(db, "players");
+
+        const unsubMatches = onSnapshot(matchesRef, (snapshot) => {
+            setMatchesCount(snapshot.size);
+        });
+
+        const unsubPlayers = onSnapshot(playersRef, (snapshot) => {
+            setPlayersCount(snapshot.size);
+        });
+
+        return () => {
+            unsubMatches();
+            unsubPlayers();
+        };
+    }, []);
+
     return (
         <section id="hero" className="min-h-screen bg-stone-950 text-stone-100 flex flex-col items-center justify-center p-8 relative overflow-hidden font-sans">
             {/* Background Ambience */}
@@ -21,11 +47,11 @@ export default function Hero() {
 
                 <div className="grid grid-cols-2 gap-4 pt-8">
                     <div className="p-6 rounded-lg bg-stone-900/50 border border-stone-800 backdrop-blur-sm">
-                        <span className="block text-3xl font-bold text-yellow-500 font-cinzel">0</span>
+                        <span className="block text-3xl font-bold text-yellow-500 font-cinzel">{matchesCount}</span>
                         <span className="text-xs text-stone-500 uppercase tracking-widest">Partidas</span>
                     </div>
                     <div className="p-6 rounded-lg bg-stone-900/50 border border-stone-800 backdrop-blur-sm">
-                        <span className="block text-3xl font-bold text-yellow-500 font-cinzel">5</span>
+                        <span className="block text-3xl font-bold text-yellow-500 font-cinzel">{playersCount}</span>
                         <span className="text-xs text-stone-500 uppercase tracking-widest">Jogadores</span>
                     </div>
                 </div>
