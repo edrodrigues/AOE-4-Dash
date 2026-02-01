@@ -1,0 +1,3 @@
+module.exports=[52756,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(86658);a.n(d("[project]/OneDrive/Documentos/AOE4 Ranking/aoe4-ranking/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},34175,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(86658);a.n(d("[project]/OneDrive/Documentos/AOE4 Ranking/aoe4-ranking/node_modules/next/dist/client/components/builtin/global-error.js"))},80190,a=>{"use strict";a.i(52756);var b=a.i(34175);a.n(b)}];
+
+//# sourceMappingURL=5bdaf_next_dist_client_components_builtin_global-error_a1a68192.js.map
