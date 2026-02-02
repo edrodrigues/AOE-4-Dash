@@ -64,11 +64,13 @@ export default function MatchHistory() {
         if (!timestamp) return "Data desconhecida";
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
         return new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
             day: '2-digit',
             month: 'long',
             year: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZoneName: 'short'
         }).format(date);
     };
 

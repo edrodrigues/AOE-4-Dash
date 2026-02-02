@@ -85,7 +85,7 @@ export default function PointsEvolutionChart() {
 
                 // Create data point
                 const dataPoint: any = {
-                    date: match.date.toDate ? match.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : `Partida ${index + 1}`,
+                    date: match.date.toDate ? match.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) : `Partida ${index + 1}`,
                     matchIndex: index + 1
                 };
 
