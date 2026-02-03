@@ -3,6 +3,7 @@ import Leaderboard from "@/components/Leaderboard";
 import MatchHistory from "@/components/MatchHistory";
 import AddMatchForm from "@/components/AddMatchForm";
 import Navigation from "@/components/Navigation";
+import PointsExplanation from "@/components/PointsExplanation";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         <MatchHistory />
         <AddMatchForm />
       </main>
+      <PointsExplanation />
     </>
   );
 }
