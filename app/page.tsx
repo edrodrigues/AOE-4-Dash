@@ -4,6 +4,7 @@ import MatchHistory from "@/components/MatchHistory";
 import AddMatchForm from "@/components/AddMatchForm";
 import Navigation from "@/components/Navigation";
 import PointsExplanation from "@/components/PointsExplanation";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
         <AddMatchForm />
       </main>
       <PointsExplanation />
+      <Footer />
     </>
   );
 }

@@ -4,7 +4,7 @@ import { Trophy, Users, Crown, Medal } from "lucide-react";
 
 export default function PointsExplanation() {
     return (
-        <section className="bg-stone-900/50 border-t border-stone-800 py-12">
+        <section className="bg-stone-950 border-t border-stone-800 py-12">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold font-cinzel text-yellow-500 mb-2">
