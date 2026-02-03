@@ -65,21 +65,29 @@ export default function AddMatchForm() {
         setSelectedPlayers(newPlayers);
     };
 
-    const calculatePoints = (rank: number): number => {
-        switch (rank) {
-            case 1: return 3;
-            case 2: return 2;
-            case 3: return 1;
-            case 4: return 0;
-            default: return 0;
+    const calculatePoints = (rank: number, totalPlayers: number): number => {
+        if (totalPlayers === 2) {
+            switch (rank) {
+                case 1: return 2;
+                case 2: return 0;
+                default: return 0;
+            }
+        } else {
+            switch (rank) {
+                case 1: return 3;
+                case 2: return 2;
+                case 3: return 1;
+                case 4: return 0;
+                default: return 0;
+            }
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (selectedPlayers.length < 3) {
-            alert("Selecione pelo menos 3 jogadores!");
+        if (selectedPlayers.length < 2) {
+            alert("Selecione pelo menos 2 jogadores!");
             return;
         }
 
@@ -93,7 +101,7 @@ export default function AddMatchForm() {
                 results: selectedPlayers.map(p => ({
                     playerId: p.id,
                     rank: p.rank,
-                    points: calculatePoints(p.rank)
+                    points: calculatePoints(p.rank, selectedPlayers.length)
                 }))
             };
 
@@ -102,7 +110,7 @@ export default function AddMatchForm() {
             // Update player stats
             for (const player of selectedPlayers) {
                 const playerRef = doc(db, "players", player.id);
-                const points = calculatePoints(player.rank);
+                const points = calculatePoints(player.rank, selectedPlayers.length);
 
                 await updateDoc(playerRef, {
                     "stats.points": increment(points),
@@ -168,7 +176,7 @@ export default function AddMatchForm() {
                         {/* Player Selection */}
                         <div className="bg-stone-900/50 border border-stone-800 rounded-xl p-6">
                             <label className="block text-sm font-semibold text-stone-400 mb-4 uppercase tracking-wider">
-                                Selecione os Jogadores (3-4)
+                                Selecione os Jogadores (2-4)
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                 {players.map(player => {
@@ -238,7 +246,7 @@ export default function AddMatchForm() {
                                             <span className="font-semibold flex-1">{player.name}</span>
 
                                             <span className="text-yellow-500 font-bold">
-                                                +{calculatePoints(index + 1)} pts
+                                                +{calculatePoints(index + 1, selectedPlayers.length)} pts
                                             </span>
                                         </div>
                                     ))}
@@ -263,7 +271,7 @@ export default function AddMatchForm() {
                         {/* Submit */}
                         <button
                             type="submit"
-                            disabled={loading || selectedPlayers.length < 3}
+                            disabled={loading || selectedPlayers.length < 2}
                             className="w-full px-6 py-4 bg-yellow-700 hover:bg-yellow-600 disabled:bg-stone-700 disabled:cursor-not-allowed rounded-lg transition-colors font-semibold text-lg"
                         >
                             {loading ? "Salvando..." : "⚔️ Registrar Partida"}
