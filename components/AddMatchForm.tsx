@@ -72,12 +72,20 @@ export default function AddMatchForm() {
                 case 2: return 0;
                 default: return 0;
             }
+        } else if (totalPlayers === 4) {
+            switch (rank) {
+                case 1: return 4;
+                case 2: return 3;
+                case 3: return 2;
+                case 4: return 0;
+                default: return 0;
+            }
         } else {
+            // 3 players
             switch (rank) {
                 case 1: return 3;
                 case 2: return 2;
                 case 3: return 1;
-                case 4: return 0;
                 default: return 0;
             }
         }

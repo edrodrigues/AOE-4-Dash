@@ -65,15 +65,15 @@ export default function PointsExplanation() {
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
                                 <Crown className="w-5 h-5 text-yellow-500" />
-                                <span className="text-stone-200">1º Lugar: <span className="font-bold text-yellow-500">3 pontos</span></span>
+                                <span className="text-stone-200">1º Lugar: <span className="font-bold text-yellow-500">4 pontos</span></span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Medal className="w-5 h-5 text-stone-400" />
-                                <span className="text-stone-200">2º Lugar: <span className="font-bold text-stone-300">2 pontos</span></span>
+                                <Medal className="w-5 h-5 text-stone-300" />
+                                <span className="text-stone-200">2º Lugar: <span className="font-bold text-stone-300">3 pontos</span></span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Medal className="w-5 h-5 text-stone-600" />
-                                <span className="text-stone-200">3º Lugar: <span className="font-bold text-stone-400">1 ponto</span></span>
+                                <Medal className="w-5 h-5 text-stone-500" />
+                                <span className="text-stone-200">3º Lugar: <span className="font-bold text-stone-400">2 pontos</span></span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Medal className="w-5 h-5 text-stone-700" />
