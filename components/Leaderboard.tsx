@@ -6,6 +6,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Crown } from "lucide-react";
 import PointsEvolutionChart from "@/components/PointsEvolutionChart";
 import PlayerAvatar from "@/components/PlayerAvatar";
+import { logError } from "@/lib/logger";
 
 interface PlayerStats {
     id: string;
@@ -39,7 +40,7 @@ export default function Leaderboard() {
 
             setPlayers(playersList);
         } catch (error) {
-            console.error("Erro ao carregar jogadores:", error);
+            logError("Erro ao carregar jogadores", error, { component: 'Leaderboard', action: 'loadPlayers' });
         } finally {
             setLoading(false);
         }

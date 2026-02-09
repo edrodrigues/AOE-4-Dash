@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, getDocs, doc, updateDoc, increment, Timestamp } from "firebase/firestore";
 import { Trophy } from "lucide-react";
 import PlayerAvatar from "@/components/PlayerAvatar";
+import { logError, getUserFriendlyMessage } from "@/lib/logger";
 
 interface Player {
     id: string;
@@ -139,8 +140,8 @@ export default function AddMatchForm() {
             }, 2000);
 
         } catch (error) {
-            console.error("Erro ao adicionar partida:", error);
-            alert("Erro ao adicionar partida. Tente novamente.");
+            logError("Erro ao adicionar partida", error, { component: 'AddMatchForm', action: 'handleSubmit' });
+            alert(getUserFriendlyMessage(error));
         } finally {
             setLoading(false);
         }
@@ -195,8 +196,8 @@ export default function AddMatchForm() {
                                             type="button"
                                             onClick={() => togglePlayer(player)}
                                             className={`p-4 rounded-lg border-2 transition-all ${isSelected
-                                                    ? "border-yellow-700 bg-yellow-900/20"
-                                                    : "border-stone-700 bg-stone-800/50 hover:border-stone-600"
+                                                ? "border-yellow-700 bg-yellow-900/20"
+                                                : "border-stone-700 bg-stone-800/50 hover:border-stone-600"
                                                 }`}
                                         >
                                             <div className="mx-auto mb-2 flex justify-center">

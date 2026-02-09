@@ -1,16 +1,15 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// TODO: Replace with your Firebase Configuration
-// You can find this in the Firebase Console -> Project Settings -> General
+// Firebase configuration from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyBs15tX_VBrS9IvPN2rbJAbB9nRkDijNgk",
-    authDomain: "aoe4-dashboard.firebaseapp.com",
-    projectId: "aoe4-dashboard",
-    storageBucket: "aoe4-dashboard.firebasestorage.app",
-    messagingSenderId: "1064938687552",
-    appId: "1:1064938687552:web:18becedde33a6557c4a3a5",
-    measurementId: "G-57TVF82TDK"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase (Singleton pattern)

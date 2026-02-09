@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Calendar, Trophy } from "lucide-react";
 import { getPlayerColor } from "@/lib/playerColors";
+import { logError } from "@/lib/logger";
 
 interface Match {
     id: string;
@@ -54,7 +55,7 @@ export default function MatchHistory() {
 
             setMatches(matchesList);
         } catch (error) {
-            console.error("Erro ao carregar partidas:", error);
+            logError("Erro ao carregar partidas", error, { component: 'MatchHistory', action: 'loadMatches' });
         } finally {
             setLoading(false);
         }
