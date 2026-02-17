@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import { Crown } from "lucide-react";
+import { Crown, TrendingUp } from "lucide-react";
 import PointsEvolutionChart from "@/components/PointsEvolutionChart";
 import PlayerAvatar from "@/components/PlayerAvatar";
 import { logError } from "@/lib/logger";
@@ -19,16 +19,27 @@ interface PlayerStats {
     };
 }
 
+interface Match {
+    id: string;
+    results: {
+        playerId: string;
+        rank: number;
+        points: number;
+    }[];
+}
+
 export default function Leaderboard() {
     const [players, setPlayers] = useState<PlayerStats[]>([]);
+    const [matches, setMatches] = useState<Match[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadPlayers();
+        loadData();
     }, []);
 
-    const loadPlayers = async () => {
+    const loadData = async () => {
         try {
+            // Load players
             const playersRef = collection(db, "players");
             const q = query(playersRef, orderBy("stats.points", "desc"));
             const snapshot = await getDocs(q);
@@ -38,12 +49,45 @@ export default function Leaderboard() {
                 ...doc.data()
             } as PlayerStats));
 
+            // Load matches for PPA calculation
+            const matchesRef = collection(db, "matches");
+            const matchesSnapshot = await getDocs(matchesRef);
+            const matchesList = matchesSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as Match));
+
             setPlayers(playersList);
+            setMatches(matchesList);
         } catch (error) {
-            logError("Erro ao carregar jogadores", error, { component: 'Leaderboard', action: 'loadPlayers' });
+            logError("Erro ao carregar dados", error, { component: 'Leaderboard', action: 'loadData' });
         } finally {
             setLoading(false);
         }
+    };
+
+    const calculatePPA = (playerId: string, matchesPlayed: number): number => {
+        if (matchesPlayed === 0) return 0;
+
+        let weightedPoints = 0;
+
+        matches.forEach(match => {
+            const playerResult = match.results.find(r => r.playerId === playerId);
+            if (playerResult) {
+                const numPlayers = match.results.length;
+                let weight = 1;
+                
+                if (numPlayers === 3) {
+                    weight = 1.5;
+                } else if (numPlayers === 4) {
+                    weight = 2;
+                }
+
+                weightedPoints += playerResult.points * weight;
+            }
+        });
+
+        return weightedPoints / matchesPlayed;
     };
 
     if (loading) {
@@ -79,22 +123,28 @@ export default function Leaderboard() {
                         <table className="w-full">
                             <thead className="bg-stone-900/80 border-b border-stone-800">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Posição do jogador no ranking baseado nos pontos totais">
                                         Posição
                                     </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Nome do jogador">
                                         Jogador
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Soma total de pontos ganhos em todas as partidas">
                                         Pontos
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Pontos por Partida Ajustados: Média de pontos ponderada pelo número de jogadores (2 jogadores = peso 1, 3 jogadores = peso 1.5, 4 jogadores = peso 2)">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <TrendingUp className="w-3 h-3" />
+                                            PPA
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Número total de partidas vencidas (1º lugar)">
                                         Vitórias
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Número total de partidas jogadas">
                                         Partidas
                                     </th>
-                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider">
+                                    <th className="px-6 py-4 text-center text-xs font-semibold text-stone-400 uppercase tracking-wider cursor-help" title="Percentual de vitórias em relação ao total de partidas jogadas">
                                         Taxa de Vitória
                                     </th>
                                 </tr>
@@ -104,6 +154,8 @@ export default function Leaderboard() {
                                     const winRate = player.stats.matchesPlayed > 0
                                         ? ((player.stats.wins / player.stats.matchesPlayed) * 100).toFixed(0)
                                         : "0";
+
+                                    const ppa = calculatePPA(player.id, player.stats.matchesPlayed);
 
                                     const isTopPlayer = index === 0 && player.stats.points > 0;
 
@@ -135,6 +187,11 @@ export default function Leaderboard() {
                                             <td className="px-6 py-4 text-center">
                                                 <span className="text-2xl font-bold font-cinzel text-yellow-500">
                                                     {player.stats.points}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="text-lg font-semibold text-emerald-400" title="Pontos por Partida Ajustados">
+                                                    {ppa.toFixed(2)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
