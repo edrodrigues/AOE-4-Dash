@@ -7,6 +7,9 @@ import { Calendar, Trophy } from "lucide-react";
 import { getPlayerColor } from "@/lib/playerColors";
 import { logError } from "@/lib/logger";
 
+import TimePeriodFilter from "@/components/TimePeriodFilter";
+import { TimePeriod, isInPeriod } from "@/lib/periodFilter";
+
 interface Match {
     id: string;
     date: any;
@@ -20,7 +23,8 @@ interface Match {
 }
 
 export default function MatchHistory() {
-    const [matches, setMatches] = useState<Match[]>([]);
+    const [allMatches, setAllMatches] = useState<Match[]>([]);
+    const [period, setPeriod] = useState<TimePeriod>("all");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -53,13 +57,15 @@ export default function MatchHistory() {
                 };
             });
 
-            setMatches(matchesList);
+            setAllMatches(matchesList);
         } catch (error) {
             logError("Erro ao carregar partidas", error, { component: 'MatchHistory', action: 'loadMatches' });
         } finally {
             setLoading(false);
         }
     };
+
+    const filteredMatches = allMatches.filter(match => isInPeriod(match.date, period));
 
     const formatDate = (timestamp: any) => {
         if (!timestamp) return "Data desconhecida";
@@ -100,7 +106,7 @@ export default function MatchHistory() {
         <section id="partidas" className="min-h-screen bg-stone-950 text-stone-100 p-8 font-sans flex items-center">
             <div className="max-w-4xl mx-auto w-full">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-8">
                     <h2 className="text-4xl md:text-6xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 mb-4">
                         Histórico de Partidas
                     </h2>
@@ -109,23 +115,26 @@ export default function MatchHistory() {
                     </p>
                 </div>
 
+                {/* Filter */}
+                <TimePeriodFilter value={period} onChange={setPeriod} />
+
                 {/* Matches List */}
-                {matches.length === 0 ? (
+                {filteredMatches.length === 0 ? (
                     <div className="text-center py-16 bg-stone-900/50 border border-stone-800 rounded-xl">
                         <Trophy className="w-16 h-16 text-stone-600 mx-auto mb-4" />
                         <p className="text-stone-400 text-lg mb-6">
-                            Nenhuma partida registrada ainda.
+                            Nenhuma partida registrada neste período.
                         </p>
                         <a
                             href="#adicionar"
                             className="inline-block px-6 py-3 bg-yellow-700 hover:bg-yellow-600 rounded-lg transition-colors font-semibold"
                         >
-                            + Adicionar Primeira Partida
+                            + Adicionar Partida
                         </a>
                     </div>
                 ) : (
                     <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-stone-700 scrollbar-track-stone-900">
-                        {matches.map((match) => (
+                        {filteredMatches.map((match) => (
                             <div
                                 key={match.id}
                                 className="bg-stone-900/50 border border-stone-800 rounded-xl p-6 backdrop-blur-sm hover:border-yellow-700/50 transition-colors"

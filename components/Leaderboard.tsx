@@ -7,6 +7,8 @@ import { Crown, TrendingUp } from "lucide-react";
 import PointsEvolutionChart from "@/components/PointsEvolutionChart";
 import PlayerAvatar from "@/components/PlayerAvatar";
 import { logError } from "@/lib/logger";
+import TimePeriodFilter from "@/components/TimePeriodFilter";
+import { TimePeriod, isInPeriod } from "@/lib/periodFilter";
 
 interface PlayerStats {
     id: string;
@@ -21,6 +23,7 @@ interface PlayerStats {
 
 interface Match {
     id: string;
+    date: any;
     results: {
         playerId: string;
         rank: number;
@@ -31,34 +34,63 @@ interface Match {
 export default function Leaderboard() {
     const [players, setPlayers] = useState<PlayerStats[]>([]);
     const [matches, setMatches] = useState<Match[]>([]);
+    const [period, setPeriod] = useState<TimePeriod>("all");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [period]);
 
     const loadData = async () => {
         try {
             // Load players
             const playersRef = collection(db, "players");
-            const q = query(playersRef, orderBy("stats.points", "desc"));
-            const snapshot = await getDocs(q);
+            const playersSnapshot = await getDocs(playersRef);
 
-            const playersList = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as PlayerStats));
-
-            // Load matches for PPA calculation
+            // Load matches
             const matchesRef = collection(db, "matches");
             const matchesSnapshot = await getDocs(matchesRef);
-            const matchesList = matchesSnapshot.docs.map(doc => ({
+            const allMatches = matchesSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             } as Match));
 
-            setPlayers(playersList);
-            setMatches(matchesList);
+            // Filter matches by period
+            const filteredMatches = allMatches.filter(m => isInPeriod(m.date, period));
+
+            // Calculate stats dynamically based on filtered matches
+            const playersWithStats = playersSnapshot.docs.map(doc => {
+                const playerData = doc.data();
+                const playerId = doc.id;
+                
+                const stats = {
+                    wins: 0,
+                    points: 0,
+                    matchesPlayed: 0
+                };
+
+                filteredMatches.forEach(match => {
+                    const result = match.results.find(r => r.playerId === playerId);
+                    if (result) {
+                        stats.matchesPlayed++;
+                        stats.points += result.points;
+                        if (result.rank === 1) stats.wins++;
+                    }
+                });
+
+                return {
+                    id: playerId,
+                    name: playerData.name,
+                    avatar_url: playerData.avatar_url,
+                    stats
+                } as PlayerStats;
+            });
+
+            // Sort by points desc
+            playersWithStats.sort((a, b) => b.stats.points - a.stats.points);
+
+            setPlayers(playersWithStats);
+            setMatches(filteredMatches);
         } catch (error) {
             logError("Erro ao carregar dados", error, { component: 'Leaderboard', action: 'loadData' });
         } finally {
@@ -105,7 +137,7 @@ export default function Leaderboard() {
         <section id="classificacao" className="min-h-screen bg-stone-950 text-stone-100 p-8 font-sans flex items-center">
             <div className="max-w-5xl mx-auto w-full">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-8">
                     <h2 className="text-4xl md:text-6xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 mb-4">
                         Classificação
                     </h2>
@@ -114,8 +146,11 @@ export default function Leaderboard() {
                     </p>
                 </div>
 
+                {/* Filter */}
+                <TimePeriodFilter value={period} onChange={setPeriod} />
+
                 {/* Points Evolution Chart */}
-                <PointsEvolutionChart />
+                <PointsEvolutionChart period={period} />
 
                 {/* Leaderboard Table */}
                 <div className="bg-stone-900/50 border border-stone-800 rounded-xl overflow-hidden backdrop-blur-sm">

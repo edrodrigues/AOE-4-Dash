@@ -7,6 +7,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { getPlayerColor } from "@/lib/playerColors";
 import { logError } from "@/lib/logger";
 
+import { TimePeriod, isInPeriod } from "@/lib/periodFilter";
+
 interface Match {
     id: string;
     date: any;
@@ -23,14 +25,18 @@ interface PlayerEvolution {
     color: string;
 }
 
-export default function PointsEvolutionChart() {
+interface PointsEvolutionChartProps {
+    period: TimePeriod;
+}
+
+export default function PointsEvolutionChart({ period }: PointsEvolutionChartProps) {
     const [chartData, setChartData] = useState<any[]>([]);
     const [players, setPlayers] = useState<PlayerEvolution[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadEvolutionData();
-    }, []);
+    }, [period]);
 
     const loadEvolutionData = async () => {
         try {
@@ -53,10 +59,13 @@ export default function PointsEvolutionChart() {
             const q = query(matchesRef, orderBy("date", "asc"));
             const matchesSnapshot = await getDocs(q);
 
-            const matches: Match[] = matchesSnapshot.docs.map(doc => ({
+            const allMatches: Match[] = matchesSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             } as Match));
+
+            // Filter matches by period
+            const matches = allMatches.filter(m => isInPeriod(m.date, period));
 
             // Calculate cumulative points for each player over time
             const playerPoints = new Map<string, number>();
